@@ -1,0 +1,30 @@
+{
+  "name2id": {
+    "Ants": 0,
+    "Bees": 1,
+    "Beetles": 2,
+    "Caterpillars": 3,
+    "Earthworms": 4,
+    "Earwigs": 5,
+    "Grasshoppers": 6,
+    "Moths": 7,
+    "Slugs": 8,
+    "Snails": 9,
+    "Wasps": 10,
+    "Weevils": 11
+  },
+  "id2name": {
+    "0": "Ants",
+    "1": "Bees",
+    "2": "Beetles",
+    "3": "Caterpillars",
+    "4": "Earthworms",
+    "5": "Earwigs",
+    "6": "Grasshoppers",
+    "7": "Moths",
+    "8": "Slugs",
+    "9": "Snails",
+    "10": "Wasps",
+    "11": "Weevils"
+  }
+}
