@@ -5,6 +5,7 @@ import yaml
 import pathlib
 import subprocess
 
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "scripts" / "config.yaml"
 
