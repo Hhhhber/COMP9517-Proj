@@ -1,0 +1,31 @@
+paths:
+  # Data part
+  data_dir: 'data/'
+  label_map: 'outputs/labelmap.json'
+
+  # Traditional output
+  trad_model: 'outputs/svm_model.pkl'
+  trad_pred_valid: 'outputs/preds_trad_valid.json'
+  trad_pred_test: 'outputs/pred_trad_test.json'
+
+  # Deep learning output(hold)
+  deep_output: 'deep/predict_deep.json'
+  eval_output: 'eval/results.csv'
+
+  # Evaluation(hold)
+  eval-results: 'outputs/eval_metrics.csv'
+
+modules:
+  traditional:
+    main_script: 'traditional/pipeline.py'
+    classifier: 'traditional/classifier.py'
+    features: 'traditional/features.py'
+    prepare_data: 'traditional/prepare_dataset.py'
+
+  deep: # (hold)
+    main_script: 'deep/yolo_train.py'
+
+params:
+  device: 'cuda'
+  confidence_threshold: 0.5
+  random_seed: 42
