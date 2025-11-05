@@ -42,7 +42,7 @@ def run_traditional(cfg):
     sh([sys.executable, str(entry), "--config", str(CONFIG)])
 
 def run_deep(cfg):
-    print("Step 3:  …")
+    print("Step 3:…")
     entry = ROOT / cfg["modules"]["deep"]["main_script"]
     if not entry.exists():
         print(f"：{entry}")
