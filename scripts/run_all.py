@@ -32,7 +32,7 @@ def run_traditional(cfg):
     print("Step 2: …")
     entry = ROOT / cfg["modules"]["traditional"]["main_script"]
     if not entry.exists():
-        raise FileNotFoundError(f"找不到传统方法入口脚本：{entry}")
+        raise FileNotFoundError(f"：{entry}")
 
     # make sure output directory
     ensure_parent(ROOT / cfg["paths"]["trad_pred_valid"])
