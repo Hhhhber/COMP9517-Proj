@@ -21,7 +21,7 @@ def load_cfg():
         return yaml.safe_load(f)
 
 def run_data(cfg):
-    print("Step 1:…")
+    print("Step 1: …")
     data_dir = ROOT / cfg["paths"]["data_dir"]
     if not data_dir.exists():
         print(f"data directory not found：{data_dir}")
@@ -32,7 +32,7 @@ def run_traditional(cfg):
     print("Step 2: …")
     entry = ROOT / cfg["modules"]["traditional"]["main_script"]
     if not entry.exists():
-        raise FileNotFoundError(f"：{entry}")
+        raise FileNotFoundError(f": {entry}")
 
     # make sure output directory
     ensure_parent(ROOT / cfg["paths"]["trad_pred_valid"])
