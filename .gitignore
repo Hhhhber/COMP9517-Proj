@@ -1,0 +1,16 @@
+# big data & logs
+datasets/
+outputs/
+runs/
+
+# weights / models
+*.pt
+*.pth
+*.onnx
+
+# caches
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.log
+*.zip
