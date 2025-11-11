@@ -1,4 +1,5 @@
 import argparse, glob, os, time
+from pathlib import Path 
 from datetime import datetime
 from ultralytics import YOLO
 
@@ -21,7 +22,7 @@ def main():
     parser.add_argument("--device",  type=str, default="0")
     parser.add_argument("--save_txt", action="store_true", help="save detections to TXT")
     args = parser.parse_args()
-
+    Path(RUNS_ROOT).mkdir(parents=True, exist_ok=True)
     weights = args.weights or latest_best()
     if not weights:
         raise FileNotFoundError("Could not find best.pt under runs/detect/train*/weights/. Use --weights to specify.")
