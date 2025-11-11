@@ -2,7 +2,7 @@ import argparse, glob, os, time
 from datetime import datetime
 from ultralytics import YOLO
 
-RUNS_ROOT = "/root/autodl-tmp/yolo/runs/detect"
+RUNS_ROOT = "/outputs/deep_learning/detect"
 
 def latest_best(runs_root=RUNS_ROOT):
     trains = sorted(glob.glob(os.path.join(runs_root, "train*")), key=os.path.getmtime)
@@ -15,7 +15,7 @@ def latest_best(runs_root=RUNS_ROOT):
 def main():
     parser = argparse.ArgumentParser(description="YOLO predict helper")
     parser.add_argument("--weights", type=str, default=None, help="path to best.pt")
-    parser.add_argument("--source",  type=str, default="/root/autodl-tmp/dataset/test/images", help="images or folder")
+    parser.add_argument("--source",  type=str, default="/data/AgroPest-12/test/images", help="images or folder")
     parser.add_argument("--imgsz",   type=int, default=640)
     parser.add_argument("--conf",    type=float, default=0.25)
     parser.add_argument("--device",  type=str, default="0")
