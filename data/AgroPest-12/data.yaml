@@ -1,0 +1,20 @@
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 12
+names:
+  [
+    "Ants",
+    "Bees",
+    "Beetles",
+    "Caterpillars",
+    "Earthworms",
+    "Earwigs",
+    "Grasshoppers",
+    "Moths",
+    "Slugs",
+    "Snails",
+    "Wasps",
+    "Weevils",
+  ]

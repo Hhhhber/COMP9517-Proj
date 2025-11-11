@@ -54,7 +54,7 @@ def load_features(root_dir: str, feature="hog",limit_per_class:int=200):
 
 def train_svm(train_dir: str, model_path: str, labelmap_path: str, feature="hog"):
     #传入每类上限（先用200，可以调大/关掉）
-    X, y, name2id, id2name = load_features(train_dir, feature, limit_per_class=200)
+    X, y, name2id, id2name = load_features(train_dir, feature, limit_per_class=-1)
 
     print(f"!!start SVC(probability=True), samples={len(y)}, dim={X.shape[1]}")
     t0 = time.time()
@@ -91,7 +91,7 @@ def predict_dir(model_path: str, labelmap_path: str, img_dir: str, feature="hog"
         H, W = img.shape[:2]
         preds.append({
             "image_id": p.name,
-            "box": [0,0,W,H],         #先用整图占位；接入候选框后替换
+            "box": [0,0,W,H],         #先用整图占位 接入候选框后替换
             "score": score,
             "label": label_id,
             "label_name": id2name[label_id],

@@ -1,0 +1,5 @@
+outputs/traditional/checkpoints/svm_model.pkl
+archive.zip
+__pycache__/
+archive.zip
+*.tar

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# 使用文件名前缀(ants-, bees-, ...)推断真值，评估 preds_trad_valid.json
+# 使用文件名前缀(ants-, bees-, ...)推断真值 评估preds_trad_valid.json
 import argparse, json, re, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 
@@ -30,8 +30,8 @@ def infer_true_label(filename: str):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--json", default="outputs/preds_trad_valid.json")
-    ap.add_argument("--out_prefix", default="outputs/valid_")
+    ap.add_argument("--json", default="./outputs/traditional/preds.json")
+    ap.add_argument("--out_prefix", default="./outputs/plot_eval/")
     args = ap.parse_args()
 
     with open(args.json, "r", encoding="utf-8") as f:
@@ -52,7 +52,7 @@ def main():
         })
 
     if not rows:
-        print("没有可评估样本，请检查文件名是否有前缀（如 ants-、bees-）")
+        print("No evaluation samples are available. Please check if the filenames have a prefix (such as ants- or bees-).")
         return
 
     import pandas as pd, numpy as np
@@ -83,7 +83,7 @@ def main():
         "support": support,
     }, index=labels).sort_index()
 
-    # 导出CSV
+    #导出CSV
     rep_csv = f"{args.out_prefix}eval_report.csv"
     cm_csv  = f"{args.out_prefix}confusion_matrix.csv"
     pred_csv= f"{args.out_prefix}predictions_with_truth.csv"
@@ -91,7 +91,7 @@ def main():
     pd.DataFrame(cm, index=labels, columns=labels).to_csv(cm_csv, index=True)
     df.to_csv(pred_csv, index=False)
 
-    # 画图（混淆矩阵）
+    #画图（混淆矩阵）
     plt.figure(figsize=(8,6))
     plt.imshow(cm, cmap="Blues")
     plt.xticks(range(len(labels)), labels, rotation=45, ha="right")
@@ -105,10 +105,10 @@ def main():
     plt.savefig(fig_png, dpi=180)
     plt.close()
 
-    print(f"样本数：{total} | 正确数：{int(np.trace(cm))} | Accuracy={acc:.4f}")
-    print(f"输出：{rep_csv}, {cm_csv}, {pred_csv}, {fig_png}")
+    print(f"samples sizes: {total} | correct number: {int(np.trace(cm))} | accuracy={acc:.4f}")
+    print(f"outputs: {rep_csv}, {cm_csv}, {pred_csv}, {fig_png}")
     if bad:
-        print(f"有 {bad} 个样本无法从文件名解析真值（前缀缺失或不在映射里）")
+        print(f" {bad} samples could not be parsed from their filenames (missing prefix or not in the mapping).")
 
 if __name__ == "__main__":
     main()

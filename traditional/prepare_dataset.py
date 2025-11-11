@@ -1,17 +1,17 @@
-# 把 data/archive 下的 YOLO 数据，整理为 data/agropest12_classic/<ClassName>/*.jpg
+# 把 data/AgroPest-12 下的 YOLO 数据，整理为 data/agropest12_classic/<ClassName>/*.jpg
 from pathlib import Path
 import shutil, yaml
 
-YAML_PATH = Path("data/archive/data.yaml")  #现在的路径
-assert YAML_PATH.exists(), f"data.yaml 不存在：{YAML_PATH}"
+YAML_PATH = Path("./data/AgroPest-12/data.yaml")  #现在的路径
+assert YAML_PATH.exists(), f"data.yaml no exist：{YAML_PATH}"
 
 cfg = yaml.safe_load(YAML_PATH.read_text(encoding="utf-8"))
 names = cfg["names"]
 root = YAML_PATH.parent
-train_img = (root / cfg["test"]).resolve()               # .../archive/train/images
-train_lbl = (root / cfg["test"].replace("images","labels")).resolve()
+train_img = (root / cfg["val"]).resolve()               # .../AgroPest-12/train/images
+train_lbl = (root / cfg["val"].replace("images","labels")).resolve()
 
-out_root = Path("data/agropest12_classic_test").resolve()
+out_root = Path("data/agropest12_classic_valid").resolve()
 out_root.mkdir(parents=True, exist_ok=True)
 for n in names:
     (out_root / n).mkdir(exist_ok=True)
