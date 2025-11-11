@@ -4,15 +4,15 @@ import numpy as np
 import os, glob, sys
 
 # ===== 可按需修改的配置 =====
-DATA     = "/data/AgroPest-12/data.yaml"                         # data.yaml 路径
-BEST     = "/outputs/deep_learning/detect/train/weights/best.pt"    # 你当前训练的best.pt
+DATA     = "./data/AgroPest-12/data.yaml"                         # data.yaml 路径
+BEST     = "./outputs/deep_learning/detect/train/weights/best.pt"    # 你当前训练的best.pt
 IMG_SIZE = 256
 BATCH    = 32
 DEVICE   = 0        # 没GPU就改成 None 或删掉 device 参数
 
 def latest_best():
     """从 runs/detect/*/weights/ 中找最近一次训练的 best.pt"""
-    cands = glob.glob("/outputs/deep_learning/detect/*/weights/best.pt")
+    cands = glob.glob("./outputs/deep_learning/detect/*/weights/best.pt")
     if not cands:
         return None
     return max(cands, key=os.path.getmtime)
