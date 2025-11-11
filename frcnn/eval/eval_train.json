@@ -1,0 +1,82 @@
+{
+  "summary": {
+    "mAP50": 0.683,
+    "precision": 0.7135,
+    "recall": 0.7366,
+    "gt_total": 15279
+  },
+  "per_class": [
+    {
+      "class": "Ants",
+      "AP50": 0.6108,
+      "GT": 2231,
+      "Det": 2885
+    },
+    {
+      "class": "Bees",
+      "AP50": 0.6996,
+      "GT": 1596,
+      "Det": 1529
+    },
+    {
+      "class": "Beetles",
+      "AP50": 0.5841,
+      "GT": 1058,
+      "Det": 880
+    },
+    {
+      "class": "Caterpillars",
+      "AP50": 0.4395,
+      "GT": 1740,
+      "Det": 1598
+    },
+    {
+      "class": "Earthworms",
+      "AP50": 0.5079,
+      "GT": 1083,
+      "Det": 1410
+    },
+    {
+      "class": "Earwigs",
+      "AP50": 0.5259,
+      "GT": 1182,
+      "Det": 798
+    },
+    {
+      "class": "Grasshoppers",
+      "AP50": 0.686,
+      "GT": 1071,
+      "Det": 1139
+    },
+    {
+      "class": "Moths",
+      "AP50": 0.903,
+      "GT": 1062,
+      "Det": 1098
+    },
+    {
+      "class": "Slugs",
+      "AP50": 0.6665,
+      "GT": 918,
+      "Det": 921
+    },
+    {
+      "class": "Snails",
+      "AP50": 0.8713,
+      "GT": 1196,
+      "Det": 1397
+    },
+    {
+      "class": "Wasps",
+      "AP50": 0.8007,
+      "GT": 1167,
+      "Det": 1113
+    },
+    {
+      "class": "Weevils",
+      "AP50": 0.9008,
+      "GT": 975,
+      "Det": 1006
+    }
+  ]
+}
