@@ -1,0 +1,26 @@
+[
+  {
+    "image_id": "ants-112-_jpg.rf.b8d6b9acf9fa1edfb438381cbae99199.jpg",
+    "box": [
+      0,
+      0,
+      640,
+      640
+    ],
+    "score": 0.17145460551342145,
+    "label": 3,
+    "label_name": "Caterpillars"
+  },
+  {
+    "image_id": "ants-122-_jpg.rf.4819e9d7a1531a8b3a430c66b0c4c4bf.jpg",
+    "box": [
+      0,
+      0,
+      640,
+      640
+    ],
+    "score": 0.16428732624528733,
+    "label": 5,
+    "label_name": "Earwigs"
+  }
+]
