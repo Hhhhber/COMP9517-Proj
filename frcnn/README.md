@@ -49,18 +49,26 @@ PYTHONPATH=. python tools/export_from_dir.py \
   --out "/root/autodl-tmp/f_cnn/outputs5/preds_trad_train.json"
 
 # Valid
-PYTHONPATH=. python tools/export_from_dir.py \
-  --images_dir "$DATA/valid/images" \
-  --weights "/root/autodl-tmp/f_cnn/runs_res50_clean/best.pth" \
-  --conf 0.6 \
-  --out "/root/autodl-tmp/f_cnn/outputs5/preds_trad_valid.json"
+python -m f_cnn.infer_frcnn \
+  --data_root /root/autodl-tmp/dataset \
+  --ckpt /root/autodl-tmp/f_cnn/runs_res50_clean/best.pth \
+  --split valid \
+  --out f_cnn/outputs/frcnn_valid_debug.json \
+  --conf_thr 0.1 \
+  --max_det 300 \
+  --device cuda \
+  --batch 2
 
 # Test
-PYTHONPATH=. python tools/export_from_dir.py \
-  --images_dir "$DATA/test/images" \
-  --weights "/root/autodl-tmp/f_cnn/runs_res50_clean/best.pth" \
-  --conf 0.6 \
-  --out "/root/autodl-tmp/f_cnn/outputs5/preds_trad_test.json"
+python -m f_cnn.infer_frcnn \
+  --data_root /root/autodl-tmp/dataset \
+  --ckpt /root/autodl-tmp/f_cnn/runs_res50_clean/best.pth \
+  --split test \
+  --out f_cnn/outputs/frcnn_test_res50_clean.json \
+  --conf_thr 0.1 \
+  --max_det 300 \
+  --device cuda \
+  --batch 4
 
 ## Notes
 - Inference threshold fixed in infer_frcnn.py: score_thresh=0.6, nms_thresh=0.5, detections_per_img=300.
