@@ -11,8 +11,6 @@ import json
 import os
 
 
-# ============== 🔧 配置区域 ==============
-
 def normalize_image_name(image_name):
     """
     处理.jpg后缀
