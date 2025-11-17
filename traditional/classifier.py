@@ -75,7 +75,7 @@ def predict_dir(model_path: str, labelmap_path: str, img_dir: str, feature="hog"
     clf = joblib.load(model_path)
     with open(labelmap_path, "r", encoding="utf-8") as f:
         maps = json.load(f)
-    id2name = {int(k):v for k,v in maps["id2name"].items()}
+    id2name = {int(k): v for k, v in maps["id2name"].items()}
 
     preds = []
     for p in Path(img_dir).rglob("*"):
@@ -84,16 +84,21 @@ def predict_dir(model_path: str, labelmap_path: str, img_dir: str, feature="hog"
         img = cv2.imread(str(p))
         if img is None:
             continue
+
         feat = extract_feature(img, kind=feature).reshape(1, -1)
-        prob = clf.predict_proba(feat)[0]
+        prob = clf.predict_proba(feat)[0]      # shape = [num_classes]
         label_id = int(np.argmax(prob))
         score = float(prob[label_id])
         H, W = img.shape[:2]
+
         preds.append({
             "image_id": p.name,
-            "box": [0,0,W,H],         #先用整图占位 接入候选框后替换
-            "score": score,
+            "box": [0, 0, W, H],              #目前用整图占位
+            "score": score,                   #预测类的置信度（最大那个）
             "label": label_id,
             "label_name": id2name[label_id],
+            "prob": prob.tolist(),            #每一类的概率数组
         })
+
     return preds
+

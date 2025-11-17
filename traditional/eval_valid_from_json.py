@@ -9,7 +9,7 @@ PREFIX2CLASS = {
     "beetle": "Beetles",
     "earwig": "Earwigs",
     "caterpillar": "Caterpillars",
-    "catterpillar": "Caterpillars",  # 兼容两种拼法
+    "catterpillar": "Caterpillars",  #兼容两种拼法
     "earthworm": "Earthworms",
     "earthworms": "Earthworms",      #有些文件可能带复数
     "grasshopper": "Grasshoppers",
