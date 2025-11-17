@@ -2,20 +2,12 @@ import numpy as np
 import os
 import json
 
-
 def normalize_image_name(image_name):
-    """
-    处理后缀
-    """
     if not image_name.endswith('.jpg'):
         return image_name + '.jpg'
     return image_name
 
-
 def load_ground_truth_boxes(label_dir, img_dir=None):
-    """
-    加载Ground Truth边界框
-    """
     gt_annotations = {}
     
     label_files = [f for f in os.listdir(label_dir) if f.endswith('.txt')]
@@ -50,10 +42,6 @@ def load_ground_truth_boxes(label_dir, img_dir=None):
 
 
 def load_prediction_boxes(pred_path, img_size=640, auto_fix_label_offset=True):
-    """
-    加载模型预测的边界框
-    处理缺少.jpg后缀的image_id, 检测并修正类别ID偏移(1-12 → 0-11)
-    """
     pred_annotations = {}
     
     if pred_path.endswith('.json'):
@@ -64,8 +52,6 @@ def load_prediction_boxes(pred_path, img_size=640, auto_fix_label_offset=True):
             sample = data[0]
             
             if 'image_id' in sample and 'label' in sample and 'box' in sample:
-                
-                # 检测类别ID范围
                 all_labels = [item['label'] for item in data]
                 min_label = min(all_labels)
                 max_label = max(all_labels)
@@ -76,13 +62,10 @@ def load_prediction_boxes(pred_path, img_size=640, auto_fix_label_offset=True):
                 
                 for pred in data:
                     img_name = normalize_image_name(pred['image_id'])
-                    
-                    # 修正类别ID
                     class_id = pred['label'] + label_offset
                     score = pred.get('score', 1.0)
                     box = pred['box']
-                    
-                    # 转换坐标
+
                     x1, y1, x2, y2 = box
                     x_center = (x1 + x2) / 2 / img_size
                     y_center = (y1 + y2) / 2 / img_size
@@ -146,9 +129,6 @@ def load_prediction_boxes(pred_path, img_size=640, auto_fix_label_offset=True):
 
 
 def box_iou(box1, box2, format='xywh'):
-    """
-    计算IoU
-    """
     if format == 'xywh':
         x1_1 = box1[0] - box1[2] / 2
         y1_1 = box1[1] - box1[3] / 2
@@ -180,9 +160,6 @@ def box_iou(box1, box2, format='xywh'):
 
 
 def calculate_ap(precisions, recalls):
-    """
-    计算AP
-    """
     mrec = np.concatenate(([0.0], recalls, [1.0]))
     mpre = np.concatenate(([0.0], precisions, [0.0]))
     
@@ -197,9 +174,6 @@ def calculate_ap(precisions, recalls):
 
 
 def calculate_map_per_class(gt_boxes, pred_boxes, class_id, iou_threshold=0.5):
-    """
-    计算单个类别的AP
-    """
     all_gt = []
     all_pred = []
     
@@ -269,9 +243,6 @@ def calculate_map_per_class(gt_boxes, pred_boxes, class_id, iou_threshold=0.5):
 
 
 def calculate_map(gt_boxes, pred_boxes, num_classes=12, iou_thresholds=[0.5]):
-    """
-    计算mAP
-    """
     results = {}
     
     for iou_thr in iou_thresholds:
@@ -298,10 +269,7 @@ def calculate_map(gt_boxes, pred_boxes, num_classes=12, iou_thresholds=[0.5]):
 
 
 def print_map_results(results, method_name="模型"):
-    """
-    打印mAP结果
-    """
-    print(f"{method_name} - 检测性能评估结果")
+    print(f"{method_name} - detection performance")
     
     for key, value in results.items():
         if key.startswith('mAP@') and not key.endswith(']'):
@@ -309,9 +277,6 @@ def print_map_results(results, method_name="模型"):
 
 
 def save_map_results(results, output_path):
-    """
-    保存mAP结果
-    """
     serializable_results = {
         k: float(v) for k, v in results.items() 
         if k.startswith('mAP@') and isinstance(v, (float, np.floating))
@@ -323,9 +288,6 @@ def save_map_results(results, output_path):
 
 def evaluate_detection(gt_label_dir, pred_path, output_json=None, method_name="模型", 
                        num_classes=12, iou_thresholds=[0.5]):
-    """
-    完整的检测评估流程
-    """
     gt_boxes = load_ground_truth_boxes(gt_label_dir)
     pred_boxes = load_prediction_boxes(pred_path)
     
@@ -338,25 +300,3 @@ def evaluate_detection(gt_label_dir, pred_path, output_json=None, method_name="�
     
     return results
 
-
-'''
-results = evaluate_detection(
-    gt_label_dir='test/labels',
-    pred_path='mock_predictions',
-    output_json='results_det.json',
-    method_name='模拟模型',
-    num_classes=12,
-    iou_thresholds=[0.5]
-)
-
-results_coco = evaluate_detection(
-    gt_label_dir='test/labels',
-    pred_path='mock_predictions',
-    output_json='results_det_coco.json',
-    method_name='模拟模型',
-    num_classes=12,
-    iou_thresholds=[round(x, 2) for x in np.arange(0.5, 1.0, 0.05)]
-)
-
-'''
-    

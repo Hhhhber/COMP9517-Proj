@@ -5,25 +5,21 @@ from sklearn.metrics import (
     f1_score, 
     accuracy_score,
     roc_auc_score,
-    confusion_matrix
+    confusion_matrix,
+    roc_curve,
+    auc
 )
 import json
 import os
-
+import matplotlib.pyplot as plt
 
 def normalize_image_name(image_name):
-    """
-    处理.jpg后缀
-    """
     if not image_name.endswith('.jpg'):
         return image_name + '.jpg'
     return image_name
 
 
 def load_ground_truth(label_dir):
-    """
-    加载Ground Truth标注 - YOLO TXT格式
-    """
     image_name_to_labels = {}
     image_name_to_boxes = {}
     
@@ -60,10 +56,6 @@ def load_ground_truth(label_dir):
 
 
 def load_predictions(pred_path, img_size=640, auto_fix_label_offset=True):
-    """
-    加载模型预测结果
-    处理缺少.jpg后缀的image_id, 检测并修正类别ID偏移(1-12 → 0-11)
-    """
     image_name_to_preds = {}
     image_name_to_scores = {}
     image_name_to_probs = {}
@@ -76,7 +68,7 @@ def load_predictions(pred_path, img_size=640, auto_fix_label_offset=True):
             sample = data[0]
             
             if 'image_id' in sample and 'label' in sample:
-
+   
                 all_labels = [item['label'] for item in data]
                 min_label = min(all_labels)
                 max_label = max(all_labels)
@@ -84,11 +76,10 @@ def load_predictions(pred_path, img_size=640, auto_fix_label_offset=True):
                 label_offset = 0
                 if auto_fix_label_offset and min_label >= 1:
                     label_offset = -1
-                
+
                 for pred in data:
                     img_name = normalize_image_name(pred['image_id'])
-                    
-                    # 修正类别ID
+
                     class_id = pred['label'] + label_offset
                     score = pred.get('score', 1.0)
                     
@@ -102,12 +93,12 @@ def load_predictions(pred_path, img_size=640, auto_fix_label_offset=True):
                     
                     if 'probs' in pred:
                         image_name_to_probs[img_name].append(pred['probs'])
-            
+                    elif 'prob' in pred:
+                        image_name_to_probs[img_name].append(pred['prob'])
             else:
                 raise ValueError("无法识别的JSON格式")
     
     elif os.path.isdir(pred_path):
-        
         txt_files = [f for f in os.listdir(pred_path) if f.endswith('.txt')]
         
         for txt_file in txt_files:
@@ -135,7 +126,7 @@ def load_predictions(pred_path, img_size=640, auto_fix_label_offset=True):
                 image_name_to_scores[img_name] = scores
     
     else:
-        raise ValueError(f"❌ 不支持的预测格式: {pred_path}")
+        raise ValueError(f"不支持的预测格式: {pred_path}")
     
     avg_preds = sum(len(p) for p in image_name_to_preds.values()) / len(image_name_to_preds) if image_name_to_preds else 0
     
@@ -143,13 +134,9 @@ def load_predictions(pred_path, img_size=640, auto_fix_label_offset=True):
 
 
 def align_gt_and_pred(gt_labels_dict, pred_labels_dict, strategy='first'):
-    """
-    对齐GT和预测
-    """
     common_names = sorted(set(gt_labels_dict.keys()) & set(pred_labels_dict.keys()))
     
     if len(common_names) == 0:
-        print("\n GT和预测没有共同的图像!")
         print(f"GT示例: {sorted(gt_labels_dict.keys())[:3]}")
         print(f"预测示例: {sorted(pred_labels_dict.keys())[:3]}")
         raise ValueError("GT和预测没有共同的图像")
@@ -175,21 +162,12 @@ def align_gt_and_pred(gt_labels_dict, pred_labels_dict, strategy='first'):
     
     missing_in_pred = len(gt_labels_dict) - len(common_names)
     if missing_in_pred > 0:
-        print(f"{missing_in_pred} 张GT图像没有对应的预测")
-    
-    print(f"{len(y_true)} 个样本用于评估 (策略: {strategy})")
-    
-    num_no_pred = (y_pred == -1).sum()
-    if num_no_pred > 0:
-        print(f"{num_no_pred} 个样本没有预测")
+        num_no_pred = (y_pred == -1).sum()
     
     return y_true, y_pred, common_names
 
 
 def calculate_classification_metrics(y_true, y_pred, y_probs=None, num_classes=12):
-    """
-    计算分类指标
-    """
     metrics = {}
     
     metrics['precision'] = precision_score(y_true, y_pred, average='macro', zero_division=0)
@@ -213,10 +191,7 @@ def calculate_classification_metrics(y_true, y_pred, y_probs=None, num_classes=1
 
 
 def print_metrics(metrics, method_name="模型"):
-    """
-    打印评估结果
-    """
-    print(f"{method_name} - 分类性能评估")
+    print(f"{method_name} - classification performance")
     print(f"Precision (macro): {metrics['precision']:.4f}")
     print(f"Recall (macro):    {metrics['recall']:.4f}")
     print(f"F1 Score (macro):  {metrics['f1']:.4f}")
@@ -229,9 +204,6 @@ def print_metrics(metrics, method_name="模型"):
 
 
 def save_metrics(metrics, output_path):
-    """
-    保存评估结果
-    """
     serializable_metrics = {
         'precision': float(metrics['precision']),
         'recall': float(metrics['recall']),
@@ -248,9 +220,6 @@ def save_metrics(metrics, output_path):
 
 
 def evaluate_classification(gt_label_dir, pred_path, output_json=None, method_name="模型", strategy='first'):
-    """
-    完整的分类评估流程
-    """
     gt_labels_dict, gt_boxes_dict = load_ground_truth(gt_label_dir)
     pred_labels_dict, pred_scores_dict, probs_dict = load_predictions(pred_path)
     
@@ -275,27 +244,53 @@ def evaluate_classification(gt_label_dir, pred_path, output_json=None, method_na
     if output_json:
         save_metrics(metrics, output_json)
     
-    return metrics
+    return metrics, y_true, y_pred, y_probs
 
-'''
-metrics = evaluate_classification(
-    gt_label_dir='test/labels',
-    pred_path='mock_predictions',
-    output_json='results_cls.json',
-    method_name='模拟模型',
-    strategy='first'
-)
+def plot_roc_curve(y_true, y_probs, class_names=None):
+    if y_probs is None:
+        return
 
-print(f"准确率: {metrics['accuracy']:.2%}")
-print(f"F1分数: {metrics['f1']:.4f}")
+    num_classes = y_probs.shape[1]
 
-import matplotlib.pyplot as plt
-cm = metrics['confusion_matrix']
-plt.figure(figsize=(10, 8))
-plt.imshow(cm, cmap='Blues')
-plt.colorbar()
-plt.title('Confusion Matrix')
-plt.xlabel('Predicted')
-plt.ylabel('True')
-plt.show()
-'''
+    plt.figure(figsize=(8, 7))
+
+    for i in range(num_classes):
+        fpr, tpr, _ = roc_curve((y_true == i).astype(int), y_probs[:, i])
+        roc_auc = auc(fpr, tpr)
+        label = f"Class {i}" if class_names is None else class_names[i]
+        plt.plot(fpr, tpr, lw=2, label=f"{label} (AUC = {roc_auc:.3f})")
+
+    plt.plot([0, 1], [0, 1], "k--", lw=1)
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve (One-vs-Rest)")
+    plt.legend(loc="lower right")
+    plt.grid(True)
+    plt.show()
+
+
+def plot_confusion_matrix(cm, class_names=None):
+
+    plt.figure(figsize=(8, 7))
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title("Confusion Matrix")
+    plt.colorbar()
+
+    num_classes = cm.shape[0]
+    tick_marks = np.arange(num_classes)
+    labels = class_names if class_names else [str(i) for i in range(num_classes)]
+
+    plt.xticks(tick_marks, labels, rotation=45)
+    plt.yticks(tick_marks, labels)
+
+    thresh = cm.max() / 2.
+    for i in range(num_classes):
+        for j in range(num_classes):
+            plt.text(j, i, format(cm[i, j], 'd'),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.tight_layout()
+    plt.show()
