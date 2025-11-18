@@ -1,0 +1,82 @@
+# =========================
+# 作业统一配置（规范与复现）
+# =========================
+project:
+  data_root: "./data/AgroPest-12"      # 源数据根（YOLO 结构）
+  outputs_root: "./outputs"            # 所有产物统一根
+
+runtime:
+  device: "cuda:0"     # 或 "cpu"
+  seed: 42
+  num_workers: 4
+  fp16: false
+
+# ------------- 流水线编排给 run_all.py 用 -------------
+pipeline:
+  use_existing: true    # true=尽量复用 ./outputs 中现有产物，避免重训
+  steps:
+    preprocess: false           # A 部分开关
+    traditional_train: false     # B 传统方法：训练
+    traditional_predict: true   # B 传统方法：预测 + valid 评估 + test 预测
+    dl_train: false             # C YOLO 训练
+    dl_predict: true            # C YOLO 预测
+    frcnn_infer: false
+    frcnn_eval: true
+    evaluate: true             # D 统一评测与画图
+
+# ------------- 各部分路径（run_all.py 会用到） -------------
+paths:
+  # --- A：预处理（可选） ---
+  preprocess:
+    input_dir: "./data/AgroPest-12/train/images"
+    output_dir: "./outputs/preprocess"
+
+  # --- B：传统方法 ---
+  traditional:
+    # 经典分类数据集（prepare_dataset.py 生成的三个文件夹）
+    classic_train_dir: "./data/agropest12_classic_train"
+    classic_valid_dir: "./data/agropest12_classic_valid"
+    classic_test_dir: "./data/agropest12_classic_test"
+
+    # SVM 模型与标签映射
+    ckpt_path: "./outputs/traditional/checkpoints/svm_model.pkl"
+    labelmap_path: "./outputs/traditional/labelmap.json"
+
+    # 预测结果 & 评估输出前缀
+    preds_valid_json: "./outputs/traditional/preds_valid.json"
+    preds_test_json: "./outputs/traditional/preds_test.json"
+    eval_prefix: "./outputs/traditional/eval_valid_"
+
+  # --- C1：深度学习（YOLO） ---
+  yolo:
+    data_yaml: "./data/AgroPest-12/data.yaml"         # train/val/test 的统一入口
+    runs_root: "./outputs/deep_yolo"       # Ultralytics 的 project
+    best_weights: "./outputs/deep_yolo/train/weights/best.pt"
+    predict_labels: "./outputs/deep_learning/detect/predict/labels"  # 预测导出的 labels 目录
+
+  # --- C2: Fast R-CNN ---
+  frcnn:
+    data_root: './data/AgroPest-12'
+    ckpt_path: './outputs/frcnn/best.pth'
+    preds_json: './outputs/frcnn/preds_frcnn_test.json'
+    eval_json: './outputs/frcnn/eval_frcnn_test.json'
+
+  # --- D：统一评测与图表导出 ---
+  plot_eval:
+    root: "./outputs/plot_eval"
+    metrics_dir: "./outputs/plot_eval/metrics"
+    figures_dir: "./outputs/plot_eval/figures"
+    cls_results_json: "./outputs/plot_eval/metrics/cls_results.json"
+    det_results_json: "./outputs/plot_eval/metrics/results_det.json"
+
+# ------------- 其他可选参数 -------------
+preprocess_params:     # A 的可选参数
+  s_thresh: 40
+  v_thresh: 50
+  kernel_size: 5
+  recursive: false
+
+eval_params:           # D 的可选参数
+  det_iou_thresholds: [0.5]                   # mAP@0.5
+  det_iou_thresholds_coco: [0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95]  # mAP@[.5:.95]
+  cls_strategy: "first"                       # 多目标对齐策略（metrics_cls.py 已支持）
