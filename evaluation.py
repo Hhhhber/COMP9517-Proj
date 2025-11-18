@@ -11,10 +11,10 @@ def main():
     # 统一的 GT 标签目录（原 YOLO 格式）
     gt_labels = project_root / "data" / "AgroPest-12" / "test" / "labels"
 
-    # 传统方法预测结果（你 run_all 里生成的是这个）
+    # 传统方法预测结果
     trad_pred = project_root / "outputs" / "traditional" / "preds_test.json"
 
-    # YOLO / FRCNN 的预测 json（后面 C 同学或你再补生成）
+    # YOLO / FRCNN 的预测 json
     yolo_pred = project_root / "outputs" / "deep_yolo" / "pred_yolo_test_with_prob_onehot.json"
     frcnn_pred = project_root / "outputs" / "frcnn" / "pred_frcnn_test_with_prob_onehot.json"
 
@@ -82,7 +82,7 @@ def main():
     if y_probs_frcnn is not None:
         plot_roc_curve(y_true_frcnn, y_probs_frcnn)
 
-    # 终端上的总对比打印（保留你同学的风格）
+    # 终端上的总对比打印
     print("\n" + "=" * 70)
     print("Traditional vs YOLO vs Faster-RCNN")
     print("=" * 70)
